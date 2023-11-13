@@ -29,6 +29,31 @@ class Customer {
     return results.rows.map(c => new Customer(c));
   }
 
+  // find customers by search bar
+
+  static async search(name) {
+    const results = await db.query(
+      `SELECT id, 
+         first_name AS "firstName",  
+         last_name AS "lastName", 
+         phone, 
+         notes
+       FROM customers
+       WHERE first_name ILIKE $1
+       OR last_name ILIKE $1
+       ORDER BY last_name, first_name`,
+       [name.toString()]
+    );
+
+    if (results.rows.length === 0){
+      const err = new Error(`No such customer: ${name}`);
+      err.status = 404;
+      throw err;
+    }
+
+    return results.rows.map(c => new Customer(c));
+  }
+
   /** get a customer by ID. */
 
   static async get(id) {
