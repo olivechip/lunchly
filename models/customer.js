@@ -54,6 +54,34 @@ class Customer {
     return results.rows.map(c => new Customer(c));
   }
 
+  // find best customers
+  
+  static async best() {
+    const results = await db.query(
+      `SELECT COUNT (customer_id), 
+        customers.id, 
+        first_name AS "firstName", 
+        last_name AS "lastName",
+        phone,
+        customers.notes
+      FROM reservations 
+      JOIN customers ON 
+        reservations.customer_id = customers.id 
+      GROUP BY 
+        customer_id, customers.id, first_name, last_name, phone, customers.notes
+      ORDER BY count desc 
+      LIMIT 10;`,
+    );
+
+    if (results.rows.length === 0){
+      const err = new Error(`There are no customers with reservations :(`);
+      err.status = 404;
+      throw err;
+    }
+
+    return results.rows.map(c => new Customer(c));
+  }
+
   /** get a customer by ID. */
 
   static async get(id) {

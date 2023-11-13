@@ -24,6 +24,17 @@ router.get("/", async function(req, res, next) {
   }
 });
 
+/** Show VIP customers */
+
+router.get("/vips", async function(req, res, next) {
+  try {
+    const customers = await Customer.best();
+    return res.render("vip_list.html", { customers });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 /** Form to add a new customer. */
 
 router.get("/add/", async function(req, res, next) {
